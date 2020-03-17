@@ -1,0 +1,8 @@
+name: ImMurder
+version: 1.0
+author: ImFireGod
+main: fr.imfiregod.murder.Main
+commands:
+  start:
+    description: Start the game.
+    permission: murder.start
