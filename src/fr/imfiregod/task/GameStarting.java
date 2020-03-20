@@ -34,8 +34,8 @@ public class GameStarting extends BukkitRunnable {
 			main.setState(GameState.WAITING);
 			cancel();
 		} else {
-			if(timer == 0) {
-				GameManager game = new GameManager();
+			if(timer == -1) {
+				GameManager game = new GameManager(this.main);
 				this.main.setGame(game);
 				game.startGame();
 				cancel();

@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import fr.imfiregod.murder.GameManager;
 import fr.imfiregod.murder.GameState;
 import fr.imfiregod.murder.Main;
 import fr.imfiregod.utils.FastBoard;
@@ -28,12 +29,15 @@ public class PlayerListener implements Listener {
 		 
 		plugin.createScoreboard(p, new FastBoard(p));
 		
-		if(plugin.getState() == GameState.WAITING) {
+		if(plugin.getState() == GameState.WAITING || plugin.getState() == GameState.STARTING) {
 			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a rejoint la partie (§c" + Bukkit.getOnlinePlayers().size() + "§7/§c16§7)");
 			this.updateOnlinePlayers();
 		} else {
 			if(plugin.gameIsStarted()) {
-				
+				GameManager game = plugin.getGame();
+				game.addSpectator(p);
+				p.teleport(Bukkit.getPlayer(game.getPlayers().get((int) (Math.random() * game.getPlayers().size()))).getLocation());
+				p.sendMessage("§cMurder §8»§7 Une partie est déjà lancée vous êtes en mode §cspectateur§7.");
 			}
 		}
 		
@@ -50,6 +54,16 @@ public class PlayerListener implements Listener {
         if(board != null) {
             board.delete();
         }
+        
+        if(plugin.getState() == GameState.WAITING || plugin.getState() == GameState.STARTING) {
+			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a quitté la partie (§c" + Bukkit.getOnlinePlayers().size() + "§7/§c16§7)");
+        }
+        
+        if(plugin.gameIsStarted()) {
+        	plugin.getGame().eliminate(p);
+			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a quitté la partie.");
+        }
+        
 	}
 	
 	private void updateOnlinePlayers() {
