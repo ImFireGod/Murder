@@ -13,7 +13,7 @@ public class GameManager {
 	private List<UUID> players = new ArrayList<>();
 	private List<UUID> spectators = new ArrayList<>();
 	private UUID murderUUID;
-	private UUID detective;
+	private UUID detectiveUUID;
 	
 	public void startGame() {
 		
@@ -28,7 +28,7 @@ public class GameManager {
 		
 		Collections.shuffle(players);
 		murderUUID = players.get(0);
-		detective = players.get(1);
+		detectiveUUID = players.get(1);
 
 	}
 }
