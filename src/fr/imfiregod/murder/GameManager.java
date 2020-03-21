@@ -71,6 +71,11 @@ public class GameManager {
 		if(this.players.contains(p.getUniqueId())) {
 			this.players.remove(p.getUniqueId());
 			this.spectators.add(p.getUniqueId());
+			if(p.getUniqueId() == this.murderUUID) {
+				this.murderUUID = null;
+			} else if (p.getUniqueId() == this.detectiveUUID) {
+				this.detectiveUUID = null;
+			}
 			for(Player player : Bukkit.getOnlinePlayers()) {
 				plugin.updateScoreboard(player);
 			}
@@ -80,6 +85,11 @@ public class GameManager {
 	public UUID getDetective() {
 		return this.detectiveUUID;
 	}
+	
+    public UUID getMurder() {
+    	return this.murderUUID;
+    }
+
 	
 	public String getPlayerRoleName(Player p) {
 		if(murderUUID == p.getUniqueId()) {

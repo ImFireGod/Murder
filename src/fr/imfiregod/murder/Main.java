@@ -56,7 +56,7 @@ public class Main extends JavaPlugin {
     public Boolean gameIsStarted() {
     	return this.game != null;
     }
-    
+        
     public FastBoard getPlayerBoard(Player p) {
     	return this.boards.get(p.getUniqueId());
     }
@@ -87,13 +87,13 @@ public class Main extends JavaPlugin {
             			"§egamers-france.ga"
             	);
         	} else if(this.state == GameState.GAMING) {
-        		int innocentSize = this.game.getPlayers().size();
+        		int innocentSize = this.game.getPlayers().size() - 1;
         		board.updateLines(
             			"§7" + df.format(new Date()),
             			"",
             			"§7Rôle: §c" + this.game.getPlayerRoleName(p),
             			"",
-            			"§7Innocent" + (innocentSize > 1 ? "s" : "") + ": §c" + (innocentSize - 1), 
+            			"§7Innocent" + (innocentSize > 1 ? "s" : "") + ": §c" + innocentSize, 
             			"§7Détective: §c" + (this.game.getDetective() != null ? "En vie" : "Mort"),
             			"",
             			"§egamers-france.ga"
