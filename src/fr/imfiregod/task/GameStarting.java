@@ -1,7 +1,6 @@
 package fr.imfiregod.task;
 
 import java.util.Collection;
-import java.util.Date;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -10,12 +10,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.imfiregod.events.PlayerListener;
+import fr.imfiregod.events.WorldListener;
 import fr.imfiregod.task.GameWaiting;
 import fr.imfiregod.utils.FastBoard;
 import fr.imfiregod.utils.Spawn;
@@ -24,6 +26,7 @@ public class Main extends JavaPlugin {
 
     private final Map<UUID, FastBoard> boards = new HashMap<>();
     private List<Spawn> spawns = new ArrayList<>();
+    private Spawn mainSpawn;
     private GameState state;
     private GameManager game;
     
@@ -45,12 +48,20 @@ public class Main extends JavaPlugin {
     	this.state = statut;
     }
     
+    public List<Spawn> getSpawns() {
+    	return this.spawns;
+    }
+    
     public GameManager getGame() {
     	return this.game;
     }
     
     public void setGame(GameManager game) {
     	this.game = game;
+    }
+    
+    public Spawn getMainSpawn() {
+    	return this.mainSpawn;
     }
     
     public Boolean gameIsStarted() {
@@ -87,27 +98,29 @@ public class Main extends JavaPlugin {
             			"§egamers-france.ga"
             	);
         	} else if(this.state == GameState.GAMING) {
-        		int innocentSize = this.game.getPlayers().size() - 1;
+        		int innocentSize = this.game.getPlayers().size() - (this.game.murderIsDead() ? 0 : 1);
         		board.updateLines(
             			"§7" + df.format(new Date()),
             			"",
             			"§7Rôle: §c" + this.game.getPlayerRoleName(p),
             			"",
             			"§7Innocent" + (innocentSize > 1 ? "s" : "") + ": §c" + innocentSize, 
-            			"§7Détective: §c" + (this.game.getDetective() != null ? "En vie" : "Mort"),
+            			"§7Détective: §c" + (this.game.detectiveIsDead() ? "Mort" : "En vie"),
             			"",
             			"§egamers-france.ga"
             	);
-        	}
+        	} 
     	}
     }
     
     private void loadEvents() {
     	PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new PlayerListener(this), this);
+		pm.registerEvents(new WorldListener(this), this);
     }
     
     private void loadConfig() {
+		this.mainSpawn = new Spawn(getConfig().getDouble("spawn.x"), getConfig().getDouble("spawn.y"), getConfig().getDouble("spawn.z"), getConfig().getString("spawn.world"));
     	ConfigurationSection section = getConfig().getConfigurationSection("spawnLocations");
 		for(String spawnLocation : section.getKeys(false)) {
 			spawns.add(
