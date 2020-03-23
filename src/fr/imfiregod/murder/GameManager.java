@@ -2,7 +2,9 @@ package fr.imfiregod.murder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -12,16 +14,12 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.imfiregod.task.FinishGame;
-import fr.imfiregod.task.GameStarting;
 import fr.imfiregod.task.GiveItems;
 import fr.imfiregod.utils.FastBoard;
 import fr.imfiregod.utils.Spawn;
@@ -30,6 +28,7 @@ public class GameManager {
 
 	private List<UUID> players = new ArrayList<>();
 	private List<UUID> spectators = new ArrayList<>();
+	private Map<UUID, Integer> playerHints = new HashMap<>();
 	private boolean murderDead = false;
 	private boolean detectiveDead = false;
 	private UUID murderUUID;
@@ -47,6 +46,7 @@ public class GameManager {
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			players.add(player.getUniqueId());
+			playerHints.put(player.getUniqueId(), 0);
 			if(spawns.size() - 1 < i) {
 				i = 0;
 			}
@@ -190,7 +190,10 @@ public class GameManager {
 		Bukkit.broadcastMessage(text);
 		plugin.setState(GameState.ENDING);
 		plugin.setGame(null);
-		new FinishGame(plugin).runTaskTimer(plugin, 0, 20);
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			p.getInventory().clear();
+		}
+		new FinishGame(plugin).runTaskTimer(plugin, 100, 20);
 	}
 	
 	public String getPlayerRoleName(Player p) {
@@ -200,5 +203,12 @@ public class GameManager {
 			return "Détective";
 		}
 		return this.players.contains(p.getUniqueId()) ? "Innocent" : "Spectateur";
+	}
+
+	public int getHints(Player p) {
+		if(this.playerHints.containsKey(p.getUniqueId())) {
+			return this.playerHints.get(p.getUniqueId());
+		}
+		return 0;
 	}
 }

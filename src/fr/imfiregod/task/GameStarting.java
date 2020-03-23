@@ -14,10 +14,12 @@ import fr.imfiregod.utils.FastBoard;
 public class GameStarting extends BukkitRunnable {
 
 	private Main main;
-	private int timer = 15;
+	private int timer;
 	
 	public GameStarting(Main main) {
 		this.main = main;
+		this.timer = 15;
+		this.changeBoard();
 	}
 	
 	@Override
@@ -42,10 +44,7 @@ public class GameStarting extends BukkitRunnable {
 				for(Player player : players) {
 					FastBoard board = main.getPlayerBoard(player);
 					if(board != null) {
-						board.updateLine(4, "§7Status: §cLancement");
 						board.updateLine(7, "§7Début dans §c" + timer + "s");
-						board.updateLine(8, "");
-						board.updateLine(9, "§egamers-france.ga");
 					}
 					player.setLevel(timer);
 				}
@@ -55,5 +54,16 @@ public class GameStarting extends BukkitRunnable {
 		timer--;
 	
 	}
-
+	
+	private void changeBoard() {
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			FastBoard board = main.getPlayerBoard(player);
+			if(board != null) {
+				board.updateLine(4, "§7Status: §cLancement");
+				board.updateLine(7, "§7Début dans §c15s");
+				board.updateLine(8, "");
+				board.updateLine(9, "§egamers-france.ga");
+			}
+		}
+	}
 }

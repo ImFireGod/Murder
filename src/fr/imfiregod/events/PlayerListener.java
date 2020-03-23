@@ -1,12 +1,18 @@
 package fr.imfiregod.events;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,11 +30,22 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.mojang.authlib.GameProfile;
+
 import fr.imfiregod.murder.GameManager;
 import fr.imfiregod.murder.GameState;
 import fr.imfiregod.murder.Main;
 import fr.imfiregod.task.BowCooldown;
 import fr.imfiregod.utils.FastBoard;
+import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.MinecraftServer;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.PacketPlayOutNamedEntitySpawn;
+import net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_14_R1.PlayerConnection;
+import net.minecraft.server.v1_14_R1.PlayerInteractManager;
+import net.minecraft.server.v1_14_R1.WorldServer;
 
 public class PlayerListener implements Listener {
 
@@ -47,6 +64,7 @@ public class PlayerListener implements Listener {
 		p.getInventory().clear();
 		p.setExp(0);
 		p.setLevel(0);
+		p.teleport(plugin.getMainSpawn().getLocation());
 		
 		if(plugin.getState() == GameState.WAITING || plugin.getState() == GameState.STARTING) {
 			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a rejoint la partie (§c" + Bukkit.getOnlinePlayers().size() + "§7/§c16§7)");
@@ -155,7 +173,7 @@ public class PlayerListener implements Listener {
         if(plugin.getState() == GameState.WAITING || plugin.getState() == GameState.STARTING) {
 			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a quitté la partie (§c" + (Bukkit.getOnlinePlayers().size() - 1) + "§7/§c16§7)");
         }
-        
+       
         if(plugin.gameIsStarted()) {
 			Bukkit.broadcastMessage("§cMurder §8» §c" + p.getDisplayName() + "§7 a quitté la partie.");
         	plugin.getGame().eliminate(p);
@@ -185,7 +203,6 @@ public class PlayerListener implements Listener {
 					event.setCancelled(true);
 				} else {
 					if(item.getType() == Material.BOW) {
-						Collection<Entity> nearbyEntites = p.getLocation().getWorld().getNearbyEntities(p.getLocation(), 8, 8, 8);
 						p.sendMessage("§cMurder §8»§7 Vous avez récupéré §cl'arc§7 du détective.");
 						p.getInventory().setItem(9, new ItemStack(Material.ARROW));
 					}
@@ -214,5 +231,4 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	
 }

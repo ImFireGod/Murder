@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.imfiregod.murder.GameState;
 import fr.imfiregod.murder.Main;
+import fr.imfiregod.utils.FastBoard;
 
 public class FinishGame extends BukkitRunnable {
 	
@@ -20,6 +21,14 @@ public class FinishGame extends BukkitRunnable {
 
 	@Override
 	public void run() {
+		
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			FastBoard playerBoard = plugin.getPlayerBoard(player);
+			if(playerBoard != null) {
+				playerBoard.updateLine(7, "§7Relancement §c" + timer + "s");
+			}
+		}
+		
 		if(timer == 0) {
 			plugin.setState(GameState.WAITING);
 			for(Player player : Bukkit.getOnlinePlayers()) {
@@ -27,8 +36,10 @@ public class FinishGame extends BukkitRunnable {
 				player.setGameMode(GameMode.ADVENTURE);
 				player.setExp(0);
 				player.setLevel(0);
+				player.getInventory().clear();
 				plugin.updateScoreboard(player);
 			}
+			cancel();
 			new GameWaiting(plugin).runTaskTimer(plugin, 0, 20);
 		}
 		timer--;

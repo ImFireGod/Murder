@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -38,9 +37,13 @@ public class Main extends JavaPlugin {
 		this.saveDefaultConfig();
 		this.loadConfig();
 		this.loadEvents();
+		this.loadCommands();
     }
     
-    public GameState getState() {
+    private void loadCommands() {
+	}
+
+	public GameState getState() {
     	return this.state;
     }
     
@@ -93,12 +96,13 @@ public class Main extends JavaPlugin {
             			"§7Carte: §cManoir",
             			"",
             			"§7Status: §cAttente",
-            			"§7Joueurs: §c" + Bukkit.getOnlinePlayers().size() + "/16",
+            			"§7Joueur: §c" + Bukkit.getOnlinePlayers().size() + "/16",
             			"",
             			"§egamers-france.ga"
             	);
-        	} else if(this.state == GameState.GAMING) {
+        	} else if(this.state == GameState.GAMING || this.state == GameState.ENDING) {
         		int innocentSize = this.game.getPlayers().size() - (this.game.murderIsDead() ? 0 : 1);
+        		int hintSize = this.game.getHints(p);
         		board.updateLines(
             			"§7" + df.format(new Date()),
             			"",
@@ -106,6 +110,8 @@ public class Main extends JavaPlugin {
             			"",
             			"§7Innocent" + (innocentSize > 1 ? "s" : "") + ": §c" + innocentSize, 
             			"§7Détective: §c" + (this.game.detectiveIsDead() ? "Mort" : "En vie"),
+            			"",
+            			"§7Indice " + (hintSize > 0 ? "s" : "") + ": §c" + hintSize + "/3",
             			"",
             			"§egamers-france.ga"
             	);
@@ -116,7 +122,7 @@ public class Main extends JavaPlugin {
     private void loadEvents() {
     	PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new PlayerListener(this), this);
-		pm.registerEvents(new WorldListener(this), this);
+		pm.registerEvents(new WorldListener(), this);
     }
     
     private void loadConfig() {
